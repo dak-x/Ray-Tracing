@@ -3,7 +3,7 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 pub type Point3 = Vec3;
 
 /// A simple struct for storing a size 3 vector
-#[derive(Clone)]
+#[derive(Clone,Copy)]
 pub struct Vec3(pub f32, pub f32, pub f32);
 
 impl Vec3 {
@@ -35,7 +35,7 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn dot(&self, rhs: Self) -> f32 {
+    pub fn dot(&self, ref rhs: Self) -> f32 {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
 
@@ -86,5 +86,18 @@ impl Div<f32> for Vec3 {
     #[inline]
     fn div(self, rhs: f32) -> Self::Output {
         self * (1f32 / rhs)
+    }
+}
+impl Default for Vec3 {
+    fn default() -> Vec3 {
+        Vec3(1f32, 1f32, 1f32)
+    }
+}
+
+impl Mul<Vec3> for f32 {
+    type Output = Vec3;
+    #[inline]
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        rhs * self
     }
 }
