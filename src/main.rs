@@ -1,35 +1,54 @@
-/// SOME DEFINITIONS
-pub struct HitRecord {
-    pub p: vec3::Point3,
-    pub normal: vec3::Vec3,
-    pub t: f32,
-}
-
-/// Trait which describes if a hit with a ray and returns a HitRecord
-pub trait Hittable {
-    fn hit(r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
-}
-
-// *=======================================================
 mod color;
+mod hittable;
 mod ray;
 mod sphere;
 mod vec3;
 
 use color::Color;
+use hittable::*;
 use ray::*;
+use sphere::*;
 use std::io::stdout;
 use std::io::Write;
+use std::rc::Rc;
 use vec3::*;
 // *=======================================================
 
+const INFINITY: f32 = std::f32::INFINITY;
+const PI: f32 = std::f32::consts::PI;
+#[inline]
+fn deg_to_rad(deg: f32) -> f32 {
+    deg * PI / 180.0
+}
+
+fn ray_color(r: &Ray, world: &impl Hittable) -> Color {
+    if let Some(rec) = world.hit(r, 0.0, INFINITY) {
+        return 0.5 * (rec.normal + Color::default());
+    }
+
+    let unit_dir = r.dir().unit_vector();
+    let t: f32 = 0.5 * (unit_dir.y() + 1.0);
+
+    (1.0 - t) * Color::default() + t * Color::new(0.5, 0.7, 1.0)
+}
+
+// *=======================================================
 fn main() {
     let mut writer = stdout();
+
     // * IMAGE
     const aspect_ratio: f32 = 16.0 / 9.0;
     const IMG_WIDTH: i32 = 400;
     const IMG_HEIGHT: i32 = (IMG_WIDTH as f32 / aspect_ratio) as i32;
 
+    // * WORLD
+    let sph1: Rc<dyn Hittable> = Rc::new(Sphere::new(Vec3(0.0, 0.0, -1.0), 0.5));
+    let sph2: Rc<dyn Hittable> = Rc::new(Sphere::new(Vec3(0.0, -100.5, -1.0), 100.0));
+
+    let mut world = HittableList::new();
+    world.add(&sph1);
+    world.add(&sph2);
+    
     // * CAMERA
     const viewport_height: f32 = 2.0;
     const viewport_width: f32 = aspect_ratio * viewport_height;
@@ -54,7 +73,7 @@ fn main() {
                 lower_left_corner + u * horizontal + v * vertical - origin,
             );
 
-            let pixel: Color = ray_color(&r);
+            let pixel: Color = ray_color(&r, &world);
 
             color::write_color(pixel, &mut writer);
         }
@@ -62,29 +81,4 @@ fn main() {
 
     writer.flush().expect("Couldnt Flush Writer");
     eprintln! {"Done"};
-}
-
-fn ray_color(r: &Ray) -> Color {
-    if let Some(t) = hit_sphere(&Vec3(0.0, 0.0, -1.0), 0.5, r) {
-        let N: Vec3 = (r.at(t) - Vec3(0.0, 0.0, -1.0)).unit_vector();
-        return 0.5 * Color::new(N.x() + 1.0, N.y() + 1.0, N.z() + 1.0);
-    }
-
-    let unit_dir = r.dir().unit_vector();
-    let t: f32 = 0.5 * (unit_dir.y() + 1.0);
-
-    (1.0 - t) * Color::default() + t * Color::new(0.5, 0.7, 1.0)
-}
-
-fn hit_sphere(center: &Point3, radius: f32, r: &Ray) -> Option<f32> {
-    let oc = r.orig() - *center;
-    let a = r.dir.length_squared();
-    let half_b = oc.dot(r.dir);
-    let c = oc.length_squared() - radius * radius;
-    let disc = half_b * half_b - a * c;
-    if disc < 0.0 {
-        None
-    } else {
-        Some((-half_b - disc.sqrt()) / a)
-    }
 }
