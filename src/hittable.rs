@@ -47,7 +47,7 @@ impl HittableList {
 impl Hittable for HittableList {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut temp_rec = HitRecord::default();
-        let mut hit_anything = true;
+        let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
         for object in &self.objects {
@@ -55,8 +55,8 @@ impl Hittable for HittableList {
                 if rec.t < closest_so_far {
                     closest_so_far = temp_rec.t;
                     temp_rec = rec;
+                    hit_anything = true;
                 }
-                hit_anything = true;
             }
         }
 
