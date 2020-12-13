@@ -2,6 +2,15 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 
 pub type Point3 = Vec3;
 
+/// Returns a random real in [0.1)
+pub fn random_f32() -> f32 {
+    rand::random::<f32>()
+}
+#[inline]
+pub fn random_range(min: f32, max: f32) -> f32 {
+    min + (max - min) * random_f32()
+}
+
 /// A simple struct for storing a size 3 vector
 #[derive(Clone, Copy)]
 pub struct Vec3(pub f32, pub f32, pub f32);
@@ -9,6 +18,28 @@ pub struct Vec3(pub f32, pub f32, pub f32);
 impl Vec3 {
     pub fn new(e0: f32, e1: f32, e2: f32) -> Self {
         Vec3(e0, e1, e2)
+    }
+
+    #[inline]
+    pub fn random() -> Self {
+        Vec3(random_f32(), random_f32(), random_f32())
+    }
+    #[inline]
+    pub fn random_range(min: f32, max: f32) -> Self {
+        Vec3(
+            random_range(min, max),
+            random_range(min, max),
+            random_range(min, max),
+        )
+    }
+
+    pub fn randon_in_unit_sphere() -> Self {
+        loop {
+            let x = Vec3::random();
+            if x.length_squared() < 1.0 {
+                return x;
+            }
+        }
     }
 
     #[inline]
