@@ -3,29 +3,29 @@ use std::ops::{Add, Div, Mul, Neg, Sub};
 pub type Point3 = Vec3;
 
 /// Returns a random real in [0.1)
-pub fn random_f32() -> f32 {
-    rand::random::<f32>()
+pub fn random_f64() -> f64 {
+    rand::random::<f64>()
 }
 #[inline]
-pub fn random_range(min: f32, max: f32) -> f32 {
-    min + (max - min) * random_f32()
+pub fn random_range(min: f64, max: f64) -> f64 {
+    min + (max - min) * random_f64()
 }
 
 /// A simple struct for storing a size 3 vector
 #[derive(Clone, Copy)]
-pub struct Vec3(pub f32, pub f32, pub f32);
+pub struct Vec3(pub f64, pub f64, pub f64);
 
 impl Vec3 {
-    pub fn new(e0: f32, e1: f32, e2: f32) -> Self {
+    pub fn new(e0: f64, e1: f64, e2: f64) -> Self {
         Vec3(e0, e1, e2)
     }
 
     #[inline]
     pub fn random() -> Self {
-        Vec3(random_f32(), random_f32(), random_f32())
+        Vec3(random_f64(), random_f64(), random_f64())
     }
     #[inline]
-    pub fn random_range(min: f32, max: f32) -> Self {
+    pub fn random_range(min: f64, max: f64) -> Self {
         Vec3(
             random_range(min, max),
             random_range(min, max),
@@ -35,7 +35,7 @@ impl Vec3 {
 
     pub fn randon_in_unit_sphere() -> Self {
         loop {
-            let x = Vec3::random();
+            let x = Vec3::random_range(-1.0,1.0);
             if x.length_squared() < 1.0 {
                 return x;
             }
@@ -43,30 +43,30 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn length(&self) -> f32 {
+    pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
     }
 
     #[inline]
-    pub fn length_squared(&self) -> f32 {
+    pub fn length_squared(&self) -> f64 {
         self.0 * self.0 + self.1 * self.1 + self.2 * self.2
     }
 
     #[inline]
-    pub fn x(&self) -> f32 {
+    pub fn x(&self) -> f64 {
         self.0
     }
     #[inline]
-    pub fn y(&self) -> f32 {
+    pub fn y(&self) -> f64 {
         self.1
     }
     #[inline]
-    pub fn z(&self) -> f32 {
+    pub fn z(&self) -> f64 {
         self.2
     }
 
     #[inline]
-    pub fn dot(&self, ref rhs: Self) -> f32 {
+    pub fn dot(&self, ref rhs: Self) -> f64 {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
 
@@ -81,7 +81,7 @@ impl Vec3 {
 
     #[inline]
     pub fn unit_vector(&self) -> Vec3 {
-        self.clone() * (1f32 / self.length())
+        self.clone() * (1f64 / self.length())
     }
 }
 impl Add for Vec3 {
@@ -105,23 +105,23 @@ impl Sub for Vec3 {
         self + (-rhs)
     }
 }
-impl Mul<f32> for Vec3 {
+impl Mul<f64> for Vec3 {
     type Output = Self;
     #[inline]
-    fn mul(self, rhs: f32) -> Self::Output {
+    fn mul(self, rhs: f64) -> Self::Output {
         Vec3(self.0 * rhs, self.1 * rhs, self.2 * rhs)
     }
 }
-impl Div<f32> for Vec3 {
+impl Div<f64> for Vec3 {
     type Output = Self;
     #[inline]
-    fn div(self, rhs: f32) -> Self::Output {
-        self * (1f32 / rhs)
+    fn div(self, rhs: f64) -> Self::Output {
+        self * (1f64 / rhs)
     }
 }
 impl Default for Vec3 {
     fn default() -> Vec3 {
-        Vec3(1f32, 1f32, 1f32)
+        Vec3(1f64, 1f64, 1f64)
     }
 }
 impl std::ops::AddAssign for Vec3 {
@@ -132,7 +132,7 @@ impl std::ops::AddAssign for Vec3 {
     }
 }
 
-impl Mul<Vec3> for f32 {
+impl Mul<Vec3> for f64 {
     type Output = Vec3;
     #[inline]
     fn mul(self, rhs: Vec3) -> Self::Output {

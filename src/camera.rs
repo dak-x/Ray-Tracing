@@ -28,7 +28,7 @@ impl Camera {
         }
     }
     #[inline]
-    pub fn get_ray(&self, u: f32, v: f32) -> crate::ray::Ray {
+    pub fn get_ray(&self, u: f64, v: f64) -> crate::ray::Ray {
         Ray {
             orig: self.origin,
             dir: self.lower_left_corner + u * self.horizontal + v * self.vertical - self.origin,
