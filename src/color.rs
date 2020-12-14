@@ -9,6 +9,7 @@ pub fn write_color(
     pixel: Color,
     samples_per_pixel: i32,
 ) -> std::io::Result<()> {
+
     let static_cast =
         |x: f64| (256.0 * clamp(f64::sqrt(x / samples_per_pixel as f64), 0.0, 0.999)) as i32;
 

@@ -11,7 +11,7 @@ use color::Color;
 use hittable::*;
 use ray::*;
 use sphere::*;
-use std::io::{Write,BufWriter,stdout};
+use std::io::{stdout, BufWriter, Write};
 use std::rc::Rc;
 use vec3::*;
 // *=======================================================
@@ -31,7 +31,7 @@ fn ray_color(r: &Ray, world: &impl Hittable, depth: i32) -> Color {
     }
 
     if let Some(rec) = world.hit(r, 0.001, INFINITY) {
-        let target: Point3 = rec.p + rec.normal + Vec3::randon_in_unit_sphere();
+        let target: Point3 = rec.p + rec.normal + Vec3::random_unit_vector();
         let new_ray = Ray::new(rec.p, target - rec.p);
         return 0.5 * ray_color(&new_ray, world, depth - 1);
     }
@@ -54,7 +54,6 @@ fn clamp(x: f64, min: f64, max: f64) -> f64 {
 // *=======================================================
 fn main() {
     let mut writer = BufWriter::new(stdout());
-    
     // * IMAGE
     const ASPECT_RATIO: f64 = 16.0 / 9.0;
     const IMG_WIDTH: i32 = 400;
@@ -81,7 +80,7 @@ fn main() {
                 let u = (i as f64 + random_f64()) / (IMG_WIDTH - 1) as f64;
                 let v = (j as f64 + random_f64()) / (IMG_HEIGHT - 1) as f64;
                 let r = cam.get_ray(u, v);
-                pixel_color += ray_color(&r, &world,MAX_DEPTH);
+                pixel_color += ray_color(&r, &world, MAX_DEPTH);
             }
             color::write_color(&mut writer, pixel_color, SAMPLES_PER_PIXEL).unwrap();
         }

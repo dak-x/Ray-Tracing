@@ -16,6 +16,7 @@ pub fn random_range(min: f64, max: f64) -> f64 {
 pub struct Vec3(pub f64, pub f64, pub f64);
 
 impl Vec3 {
+    #[inline]
     pub fn new(e0: f64, e1: f64, e2: f64) -> Self {
         Vec3(e0, e1, e2)
     }
@@ -33,6 +34,7 @@ impl Vec3 {
         )
     }
 
+    #[inline]
     pub fn randon_in_unit_sphere() -> Self {
         loop {
             let x = Vec3::random_range(-1.0,1.0);
@@ -40,6 +42,11 @@ impl Vec3 {
                 return x;
             }
         }
+    }
+
+    #[inline]
+    pub fn random_unit_vector() -> Self {
+        Vec3::randon_in_unit_sphere().unit_vector()
     }
 
     #[inline]
