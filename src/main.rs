@@ -30,7 +30,7 @@ fn ray_color(r: &Ray, world: &impl Hittable, depth: i32) -> Color {
         return Vec3(0.0, 0.0, 0.0);
     }
 
-    if let Some(rec) = world.hit(r, 0.0, INFINITY) {
+    if let Some(rec) = world.hit(r, 0.001, INFINITY) {
         let target: Point3 = rec.p + rec.normal + Vec3::randon_in_unit_sphere();
         let new_ray = Ray::new(rec.p, target - rec.p);
         return 0.5 * ray_color(&new_ray, world, depth - 1);

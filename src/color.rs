@@ -9,14 +9,17 @@ pub fn write_color(
     pixel: Color,
     samples_per_pixel: i32,
 ) -> std::io::Result<()> {
-    let static_cast = |x: f64| (256.0 * clamp(x / samples_per_pixel as f64, 0.0, 0.999)) as i32;
-    out.write(format!("{} {} {}\n",
-    static_cast(pixel.0),
-    static_cast(pixel.1),
-    static_cast(pixel.2)).as_bytes())?;
+    let static_cast =
+        |x: f64| (256.0 * clamp(f64::sqrt(x / samples_per_pixel as f64), 0.0, 0.999)) as i32;
+
+        out.write(
+        format!(
+            "{} {} {}\n",
+            static_cast(pixel.0),
+            static_cast(pixel.1),
+            static_cast(pixel.2)
+        )
+        .as_bytes(),
+    )?;
     Ok(())
-    // write! {"{} {} {}\n",
-    // static_cast(pixel.0),
-    // static_cast(pixel.1),
-    // static_cast(pixel.2)}
 }
