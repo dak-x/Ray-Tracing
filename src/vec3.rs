@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
 
 pub type Point3 = Vec3;
 
@@ -22,6 +22,12 @@ impl Vec3 {
     }
 
     #[inline]
+    pub fn reflect(v: &Vec3, n: &Vec3) -> Self {
+        let dif = 2.0 * v.dot(n);
+        *v - dif * (*n)
+    }
+
+    #[inline]
     pub fn random() -> Self {
         Vec3(random_f64(), random_f64(), random_f64())
     }
@@ -35,9 +41,9 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn randon_in_unit_sphere() -> Self {
+    pub fn random_in_unit_sphere() -> Self {
         loop {
-            let x = Vec3::random_range(-1.0,1.0);
+            let x = Vec3::random_range(-1.0, 1.0);
             if x.length_squared() < 1.0 {
                 return x;
             }
@@ -45,8 +51,19 @@ impl Vec3 {
     }
 
     #[inline]
+    pub fn random_in_hemishpere() -> Self {
+        Vec3::random()
+    }
+
+    #[inline]
     pub fn random_unit_vector() -> Self {
-        Vec3::randon_in_unit_sphere().unit_vector()
+        Vec3::random_in_unit_sphere().unit_vector()
+    }
+
+    #[inline]
+    pub fn near_zero(&self) -> bool {
+        let s: f64 = 1e-8;
+        self.0.abs() < s && self.1.abs() < s && self.2.abs() < s
     }
 
     #[inline]
@@ -73,7 +90,7 @@ impl Vec3 {
     }
 
     #[inline]
-    pub fn dot(&self, ref rhs: Self) -> f64 {
+    pub fn dot(&self, ref rhs: &Self) -> f64 {
         self.0 * rhs.0 + self.1 * rhs.1 + self.2 * rhs.2
     }
 
@@ -131,7 +148,7 @@ impl Default for Vec3 {
         Vec3(1f64, 1f64, 1f64)
     }
 }
-impl std::ops::AddAssign for Vec3 {
+impl AddAssign for Vec3 {
     fn add_assign(&mut self, rhs: Self) {
         self.0 += rhs.0;
         self.1 += rhs.1;
@@ -144,5 +161,13 @@ impl Mul<Vec3> for f64 {
     #[inline]
     fn mul(self, rhs: Vec3) -> Self::Output {
         rhs * self
+    }
+}
+
+impl Mul<Vec3> for Vec3 {
+    type Output = Vec3;
+    #[inline]
+    fn mul(self, rhs: Vec3) -> Self::Output {
+        Vec3(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)
     }
 }

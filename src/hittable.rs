@@ -1,19 +1,22 @@
+use crate::material::Material;
 use crate::ray::Ray;
 use crate::vec3;
+use std::rc::Rc;
 
-/// SOME DEFINITIONS
+/// The HitRecord structure, created when a ray hits an object.
 #[derive(Default)]
 pub struct HitRecord {
     pub p: vec3::Point3,
     pub normal: vec3::Vec3,
     pub t: f64,
     pub front_face: bool,
+    pub mat_ptr: Option<Rc<dyn Material>>,
 }
 
 impl HitRecord {
     #[inline]
     pub fn set_normal_face(&mut self, r: &Ray, outward_normal: vec3::Vec3) {
-        self.front_face = r.dir.dot(outward_normal) < 0.0;
+        self.front_face = r.dir.dot(&outward_normal) < 0.0;
         self.normal = if self.front_face {
             outward_normal
         } else {
@@ -26,8 +29,6 @@ impl HitRecord {
 pub trait Hittable {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord>;
 }
-
-use std::rc::Rc;
 
 pub struct HittableList {
     objects: Vec<Rc<dyn Hittable>>,
@@ -52,8 +53,8 @@ impl Hittable for HittableList {
 
         for object in &self.objects {
             if let Some(rec) = object.hit(r, t_min, t_max) {
-                if rec.t < closest_so_far {
-                    closest_so_far = temp_rec.t;
+                if rec.t <= closest_so_far {
+                    closest_so_far = rec.t;
                     temp_rec = rec;
                     hit_anything = true;
                 }
