@@ -22,10 +22,10 @@ use vec3::*;
 
 const INFINITY: f64 = std::f64::INFINITY;
 // const PI: f64 = std::f64::consts::PI;
-// 
+//
 // #[inline]
 // fn deg_to_rad(deg: f64) -> f64 {
-    // deg * PI / 180.0
+// deg * PI / 180.0
 // }
 
 #[inline]
@@ -35,7 +35,6 @@ fn ray_color(r: &Ray, world: &impl Hittable, depth: i32) -> Color {
     }
 
     if let Some(rec) = world.hit(r, 0.001, INFINITY) {
-
         let mut attenuation = Color::default();
 
         if let Some(ref scattered) =
@@ -101,8 +100,8 @@ fn init_world() -> HittableList {
 
     let material_ground = Lambertian::new(Vec3(0.8, 0.8, 0.0)).into();
     let material_center = Lambertian::new(Vec3(0.7, 0.3, 0.3)).into();
-    let material_left = Metal::new(Vec3(0.8, 0.8, 0.8)).into();
-    let material_right = Metal::new(Vec3(0.8, 0.6, 0.2)).into();
+    let material_left = Metal::new(Vec3(0.8, 0.8, 0.8), 0.3).into();
+    let material_right = Metal::new(Vec3(0.8, 0.6, 0.2), 1.0).into();
 
     world.add(&Sphere::new(Vec3(0.0, -100.5, -1.0), 100.0, &material_ground).into());
     world.add(&Sphere::new(Vec3(0.0, 0.0, -1.0), 0.5, &material_center).into());
