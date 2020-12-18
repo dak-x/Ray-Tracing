@@ -24,9 +24,9 @@ impl Sphere {
 
 impl Hittable for Sphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
-        let oc = r.orig() - self.center;
-        let a = r.dir.length_squared();
-        let half_b = oc.dot(&r.dir);
+        let oc: Vec3 = r.orig() - self.center;
+        let a = r.dir().length_squared();
+        let half_b = oc.dot(&r.dir());
         let c = oc.length_squared() - self.radius * self.radius;
 
         let disc = half_b * half_b - a * c;

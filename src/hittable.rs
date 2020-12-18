@@ -16,7 +16,7 @@ pub struct HitRecord {
 impl HitRecord {
     #[inline]
     pub fn set_normal_face(&mut self, r: &Ray, outward_normal: vec3::Vec3) {
-        self.front_face = r.dir.dot(&outward_normal) < 0.0;
+        self.front_face = r.dir().dot(&outward_normal) < 0.0;
         self.normal = if self.front_face {
             outward_normal
         } else {
@@ -52,12 +52,10 @@ impl Hittable for HittableList {
         let mut closest_so_far = t_max;
 
         for object in &self.objects {
-            if let Some(rec) = object.hit(r, t_min, t_max) {
-                if rec.t <= closest_so_far {
+            if let Some(rec) = object.hit(r, t_min, closest_so_far) {
+                    hit_anything = true;
                     closest_so_far = rec.t;
                     temp_rec = rec;
-                    hit_anything = true;
-                }
             }
         }
 

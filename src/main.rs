@@ -21,12 +21,6 @@ use vec3::*;
 /* ======================================================= */
 
 const INFINITY: f64 = std::f64::INFINITY;
-// const PI: f64 = std::f64::consts::PI;
-//
-// #[inline]
-// fn deg_to_rad(deg: f64) -> f64 {
-// deg * PI / 180.0
-// }
 
 #[inline]
 fn ray_color(r: &Ray, world: &impl Hittable, depth: i32) -> Color {
@@ -69,9 +63,24 @@ fn main() {
     const SAMPLES_PER_PIXEL: i32 = 100;
     const MAX_DEPTH: i32 = 50;
     // * CAMERA
-    let cam = Camera::new();
+
+    let lookfrom = Vec3(-0.0, 0.0, 1.0);
+    let lookat = Vec3(0.0, 0.0, -1.0);
+    let vup = Vec3(0.0, 1.0, 0.0);
+    let dist_to_focus = (lookfrom - lookat).length();
+    let aperture = 0.5;
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        50.0,
+        ASPECT_RATIO,
+        aperture,
+        dist_to_focus,
+    );
 
     // * WORLD
+
     let world = init_world();
 
     // * RENDER
@@ -94,26 +103,45 @@ fn main() {
 }
 
 // * Init the objects in the world.
-// ! This looks ugly!!!!
 fn init_world() -> HittableList {
     let mut world = HittableList::new();
 
-    // For Fuzzy two metals
+    // =================================================================
+    // For Fuzzy two metals:
     // let material_ground = Lambertian::new(Vec3(0.8, 0.8, 0.0)).into();
     // let material_center = Lambertian::new(Vec3(0.7, 0.3, 0.3)).into();
     // let material_left = Metal::new(Vec3(0.8, 0.8, 0.8), 0.3).into();
     // let material_right = Metal::new(Vec3(0.8, 0.6, 0.2), 1.0).into();
+    // =================================================================
 
-    // Making center and right balls glass (dielectric)
+    // =================================================================
+    // Making center and right balls glass (dielectric):
     let material_ground = Lambertian::new(Vec3(0.8, 0.8, 0.0)).into();
     let material_center = Lambertian::new(Vec3(0.1, 0.2, 0.5)).into();
     let material_left = Dielectric::new(1.5).into();
     let material_right = Metal::new(Vec3(0.8, 0.6, 0.2), 0.0).into();
+    // =================================================================
 
     world.add(&Sphere::new(Vec3(0.0, -100.5, -1.0), 100.0, &material_ground).into());
     world.add(&Sphere::new(Vec3(0.0, 0.0, -1.0), 0.5, &material_center).into());
     world.add(&Sphere::new(Vec3(-1.0, 0.0, -1.0), 0.5, &material_left).into());
+    world.add(&Sphere::new(Vec3(-1.0, 0.0, -1.0), -0.45, &material_left).into());
     world.add(&Sphere::new(Vec3(1.0, 0.0, -1.0), 0.5, &material_right).into());
+
+    world
+}
+
+fn init_world2() -> HittableList {
+    // ==========================================================================
+    // Testing FOV in the camera
+    let r = (PI / 4.0).cos();
+    let mut world = HittableList::new();
+    let material_left = Lambertian::new(Vec3(0.0, 0.0, 1.0)).into();
+    let material_right = Lambertian::new(Vec3(1.0, 0.0, 0.0)).into();
+
+    world.add(&Sphere::new(Vec3(-r, 0.0, -1.0), r, &material_left).into());
+    world.add(&Sphere::new(Vec3(r, 0.0, -1.0), r, &material_right).into());
+    //==========================================================================
 
     world
 }

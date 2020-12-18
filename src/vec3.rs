@@ -1,10 +1,11 @@
-use std::{
-    ops::{Add, AddAssign, Div, Mul, Neg, Sub},
-};
+use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
+
+use crate::clamp;
 
 pub type Point3 = Vec3;
 
 /// Returns a random real in [0.1)
+#[inline]
 pub fn random_f64() -> f64 {
     rand::random::<f64>()
 }
@@ -53,6 +54,16 @@ impl Vec3 {
     }
 
     #[inline]
+    pub fn random_in_unit_disk() -> Self {
+        loop {
+            let p = Vec3::new(random_range(-1.0, 1.0), random_range(-1.0, 1.0), 0.0);
+            if p.length_squared() < 1.0 {
+                return p;
+            }
+        }
+    }
+
+    #[inline]
     pub fn random_in_hemishpere() -> Self {
         Vec3::random()
     }
@@ -69,15 +80,7 @@ impl Vec3 {
     }
 
     pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Self {
-        let cos_theta = {
-            let c = -(uv).dot(n);
-            if c < 1.0 {
-                c
-            } else {
-                1.0
-            }
-        };
-
+        let cos_theta = clamp((-*uv).dot(n), -1.0, 1.0);
         let r_out_perp: Vec3 = etai_over_etat * (*uv + cos_theta * (*n));
         let r_out_parallel: Vec3 =
             -1.0 * f64::sqrt((1.0 - r_out_perp.length_squared()).abs()) * (*n);
@@ -130,35 +133,35 @@ impl Vec3 {
 impl Add for Vec3 {
     type Output = Self;
     #[inline]
-    fn add(self, rhs: Self) -> Self::Output {
+    fn add(self, rhs: Self) -> Vec3 {
         Vec3(self.0 + rhs.0, self.1 + rhs.1, self.2 + rhs.2)
     }
 }
 impl Neg for Vec3 {
     type Output = Self;
     #[inline]
-    fn neg(self) -> Self::Output {
+    fn neg(self) -> Vec3 {
         Vec3(-self.0, -self.1, -self.2)
     }
 }
 impl Sub for Vec3 {
     type Output = Self;
     #[inline]
-    fn sub(self, rhs: Self) -> Self::Output {
+    fn sub(self, rhs: Self) -> Vec3 {
         self + (-rhs)
     }
 }
 impl Mul<f64> for Vec3 {
     type Output = Self;
     #[inline]
-    fn mul(self, rhs: f64) -> Self::Output {
+    fn mul(self, rhs: f64) -> Vec3 {
         Vec3(self.0 * rhs, self.1 * rhs, self.2 * rhs)
     }
 }
 impl Div<f64> for Vec3 {
     type Output = Self;
     #[inline]
-    fn div(self, rhs: f64) -> Self::Output {
+    fn div(self, rhs: f64) -> Vec3 {
         self * (1f64 / rhs)
     }
 }
@@ -178,7 +181,7 @@ impl AddAssign for Vec3 {
 impl Mul<Vec3> for f64 {
     type Output = Vec3;
     #[inline]
-    fn mul(self, rhs: Vec3) -> Self::Output {
+    fn mul(self, rhs: Vec3) -> Vec3 {
         rhs * self
     }
 }
@@ -186,7 +189,7 @@ impl Mul<Vec3> for f64 {
 impl Mul<Vec3> for Vec3 {
     type Output = Vec3;
     #[inline]
-    fn mul(self, rhs: Vec3) -> Self::Output {
+    fn mul(self, rhs: Vec3) -> Vec3 {
         Vec3(self.0 * rhs.0, self.1 * rhs.1, self.2 * rhs.2)
     }
 }

@@ -14,7 +14,7 @@ impl Ray {
         self.orig.clone()
     }
     pub fn dir(&self) -> Vec3 {
-        self.dir.clone()
+        self.dir
     }
 
     pub fn at(&self, t: f64) -> Point3 {
