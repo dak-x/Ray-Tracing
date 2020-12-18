@@ -98,10 +98,17 @@ fn main() {
 fn init_world() -> HittableList {
     let mut world = HittableList::new();
 
+    // For Fuzzy two metals
+    // let material_ground = Lambertian::new(Vec3(0.8, 0.8, 0.0)).into();
+    // let material_center = Lambertian::new(Vec3(0.7, 0.3, 0.3)).into();
+    // let material_left = Metal::new(Vec3(0.8, 0.8, 0.8), 0.3).into();
+    // let material_right = Metal::new(Vec3(0.8, 0.6, 0.2), 1.0).into();
+
+    // Making center and right balls glass (dielectric)
     let material_ground = Lambertian::new(Vec3(0.8, 0.8, 0.0)).into();
-    let material_center = Lambertian::new(Vec3(0.7, 0.3, 0.3)).into();
-    let material_left = Metal::new(Vec3(0.8, 0.8, 0.8), 0.3).into();
-    let material_right = Metal::new(Vec3(0.8, 0.6, 0.2), 1.0).into();
+    let material_center = Lambertian::new(Vec3(0.1, 0.2, 0.5)).into();
+    let material_left = Dielectric::new(1.5).into();
+    let material_right = Metal::new(Vec3(0.8, 0.6, 0.2), 0.0).into();
 
     world.add(&Sphere::new(Vec3(0.0, -100.5, -1.0), 100.0, &material_ground).into());
     world.add(&Sphere::new(Vec3(0.0, 0.0, -1.0), 0.5, &material_center).into());

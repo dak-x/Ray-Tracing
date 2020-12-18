@@ -1,4 +1,6 @@
-use std::ops::{Add, AddAssign, Div, Mul, Neg, Sub};
+use std::{
+    ops::{Add, AddAssign, Div, Mul, Neg, Sub},
+};
 
 pub type Point3 = Vec3;
 
@@ -64,6 +66,23 @@ impl Vec3 {
     pub fn near_zero(&self) -> bool {
         let s: f64 = 1e-8;
         self.0.abs() < s && self.1.abs() < s && self.2.abs() < s
+    }
+
+    pub fn refract(uv: &Vec3, n: &Vec3, etai_over_etat: f64) -> Self {
+        let cos_theta = {
+            let c = -(uv).dot(n);
+            if c < 1.0 {
+                c
+            } else {
+                1.0
+            }
+        };
+
+        let r_out_perp: Vec3 = etai_over_etat * (*uv + cos_theta * (*n));
+        let r_out_parallel: Vec3 =
+            -1.0 * f64::sqrt((1.0 - r_out_perp.length_squared()).abs()) * (*n);
+
+        r_out_perp + r_out_parallel
     }
 
     #[inline]
