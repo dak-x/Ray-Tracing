@@ -1,8 +1,8 @@
 use crate::vec3::*;
 use crate::*;
 
-pub const ASPECT_RATIO: f64 = 16.0 / 9.0;
-pub const IMG_WIDTH: i32 = 400;
+pub const ASPECT_RATIO: f64 = 3.0 / 2.0;
+pub const IMG_WIDTH: i32 = 800;
 pub const IMG_HEIGHT: i32 = (IMG_WIDTH as f64 / ASPECT_RATIO) as i32;
 
 pub const PI: f64 = std::f64::consts::PI;   

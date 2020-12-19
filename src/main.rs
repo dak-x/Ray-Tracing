@@ -62,26 +62,9 @@ fn main() {
     // * IMAGE
     const SAMPLES_PER_PIXEL: i32 = 100;
     const MAX_DEPTH: i32 = 50;
-    // * CAMERA
 
-    let lookfrom = Vec3(-0.0, 0.0, 1.0);
-    let lookat = Vec3(0.0, 0.0, -1.0);
-    let vup = Vec3(0.0, 1.0, 0.0);
-    let dist_to_focus = (lookfrom - lookat).length();
-    let aperture = 0.5;
-    let cam = Camera::new(
-        lookfrom,
-        lookat,
-        vup,
-        50.0,
-        ASPECT_RATIO,
-        aperture,
-        dist_to_focus,
-    );
-
-    // * WORLD
-
-    let world = init_world();
+    // * WORLD and CAMERA
+    let (world, cam) = random_scene();
 
     // * RENDER
     writeln!(writer, "P3\n{} {}\n255", IMG_WIDTH, IMG_HEIGHT).unwrap();
@@ -103,7 +86,7 @@ fn main() {
 }
 
 // * Init the objects in the world.
-fn init_world() -> HittableList {
+fn init_world() -> (HittableList,Camera) {
     let mut world = HittableList::new();
 
     // =================================================================
@@ -128,10 +111,25 @@ fn init_world() -> HittableList {
     world.add(&Sphere::new(Vec3(-1.0, 0.0, -1.0), -0.45, &material_left).into());
     world.add(&Sphere::new(Vec3(1.0, 0.0, -1.0), 0.5, &material_right).into());
 
-    world
+    let lookfrom = Vec3(-2.0, 2.0, 1.0);
+    let lookat = Vec3(0.0, 0.0, -1.0);
+    let vup = Vec3(0.0, 1.0, 0.0);
+    let dist_to_focus = (lookfrom-lookat).length();
+    let aperture = 0.1;
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        90.0,
+        ASPECT_RATIO,
+        aperture,
+        dist_to_focus,
+    );
+
+    (world,cam)
 }
 
-fn init_world2() -> HittableList {
+fn init_world2() -> (HittableList,Camera) {
     // ==========================================================================
     // Testing FOV in the camera
     let r = (PI / 4.0).cos();
@@ -142,6 +140,82 @@ fn init_world2() -> HittableList {
     world.add(&Sphere::new(Vec3(-r, 0.0, -1.0), r, &material_left).into());
     world.add(&Sphere::new(Vec3(r, 0.0, -1.0), r, &material_right).into());
     //==========================================================================
+    let lookfrom = Vec3(-2.0, 2.0, 1.0);
+    let lookat = Vec3(0.0, 0.0, -1.0);
+    let vup = Vec3(0.0, 1.0, 0.0);
+    let dist_to_focus = (lookfrom-lookat).length();
+    let aperture = 0.1;
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        20.0,
+        ASPECT_RATIO,
+        aperture,
+        dist_to_focus,
+    );
 
-    world
+    (world,cam)
+}
+
+fn random_scene() -> (HittableList, Camera) {
+
+    // * RANDOM SCENE:
+    let mut world = HittableList::new();
+
+    let ground_material = Lambertian::new(Vec3(0.5, 0.5, 0.5)).into();
+
+    world.add(&Sphere::new(Vec3(0.0, -1000.0, 0.0), 1000.0, &ground_material).into());
+
+    for a in -11i32..11 {
+        for b in -11i32..11 {
+            let choose_mat = random_f64();
+            let center = Vec3(
+                a as f64 + 0.9 * random_f64(),
+                0.2,
+                b as f64 + 0.9 * random_f64(),
+            );
+
+            if (center - Vec3(4.0, 0.2, 0.0)).length() > 0.9 {
+                let sph_mat = if choose_mat < 0.8 {
+                    // Diffuse
+                    Lambertian::new(Color::random() * Color::random()).into()
+                } else if choose_mat < 0.95 {
+                    // metal
+                    Metal::new(Color::random_range(0.5, 1.0), random_range(0.5, 1.0)).into()
+                } else {
+                    //glass
+                    Dielectric::new(1.5).into()
+                };
+                world.add(&Sphere::new(center, 0.2, &sph_mat).into());
+            }
+        }
+    }
+
+    let mat1 = Dielectric::new(1.5).into();
+    world.add(&Sphere::new(Vec3(0.0, 1.0, 0.0), 1.0, &mat1).into());
+
+    let mat2 = Lambertian::new(Vec3(0.4, 0.2, 0.1)).into();
+    world.add(&Sphere::new(Vec3(-4.0, 1.0, 0.0), 1.0, &mat2).into());
+
+    let mat3 = Metal::new(Vec3(0.7, 0.6, 0.5), 0.0).into();
+    world.add(&Sphere::new(Vec3(4.0, 1.0, 0.0), 1.0, &mat3).into());
+
+    // * CAMERA 
+    let lookfrom = Vec3(13.0, 2.0, 3.0);
+    let lookat = Vec3(0.0, 0.0, 0.0);
+    let vup = Vec3(0.0, 1.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
+    let cam = Camera::new(
+        lookfrom,
+        lookat,
+        vup,
+        20.0,
+        ASPECT_RATIO,
+        aperture,
+        dist_to_focus,
+    );
+
+    (world, cam)
 }

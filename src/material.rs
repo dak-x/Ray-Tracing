@@ -2,7 +2,7 @@ use crate::ray::Ray;
 use crate::vec3::Vec3;
 use crate::{clamp, color};
 use crate::{hittable::HitRecord, vec3::random_f64};
-use std::{rc::Rc};
+use std::rc::Rc;
 pub trait Material {
     fn scatter(&self, ray_in: &Ray, rec: &HitRecord, attenuation: &mut color::Color)
         -> Option<Ray>;
@@ -74,6 +74,7 @@ impl Dielectric {
         Dielectric { ir }
     }
 
+    #[inline]
     fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
         let mut r0 = (1.0 - ref_idx) / (1.0 + ref_idx);
         r0 = r0 * r0;
@@ -88,7 +89,6 @@ impl Material for Dielectric {
         rec: &HitRecord,
         attenuation: &mut color::Color,
     ) -> Option<Ray> {
-        
         *attenuation = Vec3(1.0, 1.0, 1.0);
         let refraction_ratio = if rec.front_face {
             1.0 / self.ir
@@ -116,6 +116,7 @@ impl Material for Dielectric {
 use std::convert::From;
 
 impl From<Lambertian> for Rc<dyn Material> {
+    #[inline]
     fn from(material: Lambertian) -> Self {
         let trait_object: Rc<dyn Material> = Rc::new(material);
         trait_object
@@ -123,6 +124,7 @@ impl From<Lambertian> for Rc<dyn Material> {
 }
 
 impl From<Metal> for Rc<dyn Material> {
+    #[inline]
     fn from(material: Metal) -> Self {
         let trait_object: Rc<dyn Material> = Rc::new(material);
         trait_object
@@ -130,6 +132,7 @@ impl From<Metal> for Rc<dyn Material> {
 }
 
 impl From<Dielectric> for Rc<dyn Material> {
+    #[inline]
     fn from(material: Dielectric) -> Self {
         let trait_object: Rc<dyn Material> = Rc::new(material);
         trait_object

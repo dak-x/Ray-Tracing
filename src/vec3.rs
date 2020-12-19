@@ -27,7 +27,7 @@ impl Vec3 {
     #[inline]
     pub fn reflect(v: &Vec3, n: &Vec3) -> Self {
         let dif = 2.0 * v.dot(n);
-        *v - dif * (*n)
+        *v - (dif * (*n))
     }
 
     #[inline]
@@ -121,7 +121,7 @@ impl Vec3 {
         Vec3(
             self.1 * rhs.2 - self.2 * rhs.1,
             self.2 * rhs.0 - self.0 * rhs.2,
-            self.0 * self.1 - self.1 * rhs.0,
+            self.0 * rhs.1 - self.1 * rhs.0,
         )
     }
 
