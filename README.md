@@ -1,4 +1,4 @@
 # Ray-Tracing
-Exploring Ray-Tracing while using rust
+Exploring Ray-Tracing while using Rust
 
-Acknowledgement: https://raytracing.github.io/books/RayTracingInOneWeekend.html#overview
+[_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)

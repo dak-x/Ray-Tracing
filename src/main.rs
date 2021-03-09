@@ -9,18 +9,21 @@ mod ray;
 mod sphere;
 mod vec3;
 /* ======================================================= */
-
 use camera::*;
 use color::Color;
 use hittable::*;
 use material::*;
 use ray::*;
 use sphere::*;
-use std::io::{stdout, BufWriter, Write};
+use std::io::{stdout,Write};
 use vec3::*;
+use write_buf::*;
 /* ======================================================= */
 
 const INFINITY: f64 = std::f64::INFINITY;
+const ASPECT_RATIO: f64 = 4.0 / 3.0;
+const IMG_WIDTH: i32 = 800;
+const IMG_HEIGHT: i32 = (IMG_WIDTH as f64 / ASPECT_RATIO) as i32;
 
 #[inline]
 fn ray_color(r: &Ray, world: &impl Hittable, depth: i32) -> Color {
@@ -58,7 +61,7 @@ fn clamp(x: f64, min: f64, max: f64) -> f64 {
 }
 
 fn main() {
-    let mut writer = BufWriter::new(stdout());
+    let mut writer = WriteBufVec::new(stdout());
     // * IMAGE
     const SAMPLES_PER_PIXEL: i32 = 100;
     const MAX_DEPTH: i32 = 50;
@@ -69,6 +72,7 @@ fn main() {
     // * RENDER
     writeln!(writer, "P3\n{} {}\n255", IMG_WIDTH, IMG_HEIGHT).unwrap();
     for j in (0..IMG_HEIGHT).rev() {
+        eprintln!("Lines Remaining: {}", j);
         for i in 0..IMG_WIDTH {
             let mut pixel_color = Color::new(0.0, 0.0, 0.0);
             for _ in 0..SAMPLES_PER_PIXEL {
@@ -86,7 +90,7 @@ fn main() {
 }
 
 // * Init the objects in the world.
-fn init_world() -> (HittableList,Camera) {
+fn init_world() -> (HittableList, Camera) {
     let mut world = HittableList::new();
 
     // =================================================================
@@ -114,22 +118,22 @@ fn init_world() -> (HittableList,Camera) {
     let lookfrom = Vec3(-2.0, 2.0, 1.0);
     let lookat = Vec3(0.0, 0.0, -1.0);
     let vup = Vec3(0.0, 1.0, 0.0);
-    let dist_to_focus = (lookfrom-lookat).length();
-    let aperture = 0.1;
+    let dist_to_focus = (lookfrom - lookat).length();
+    let aperture = 0.01;
     let cam = Camera::new(
         lookfrom,
         lookat,
         vup,
-        90.0,
+        20.0,
         ASPECT_RATIO,
         aperture,
         dist_to_focus,
     );
 
-    (world,cam)
+    (world, cam)
 }
 
-fn init_world2() -> (HittableList,Camera) {
+fn init_world2() -> (HittableList, Camera) {
     // ==========================================================================
     // Testing FOV in the camera
     let r = (PI / 4.0).cos();
@@ -143,7 +147,7 @@ fn init_world2() -> (HittableList,Camera) {
     let lookfrom = Vec3(-2.0, 2.0, 1.0);
     let lookat = Vec3(0.0, 0.0, -1.0);
     let vup = Vec3(0.0, 1.0, 0.0);
-    let dist_to_focus = (lookfrom-lookat).length();
+    let dist_to_focus = (lookfrom - lookat).length();
     let aperture = 0.1;
     let cam = Camera::new(
         lookfrom,
@@ -155,11 +159,10 @@ fn init_world2() -> (HittableList,Camera) {
         dist_to_focus,
     );
 
-    (world,cam)
+    (world, cam)
 }
 
 fn random_scene() -> (HittableList, Camera) {
-
     // * RANDOM SCENE:
     let mut world = HittableList::new();
 
@@ -201,8 +204,8 @@ fn random_scene() -> (HittableList, Camera) {
     let mat3 = Metal::new(Vec3(0.7, 0.6, 0.5), 0.0).into();
     world.add(&Sphere::new(Vec3(4.0, 1.0, 0.0), 1.0, &mat3).into());
 
-    // * CAMERA 
-    let lookfrom = Vec3(13.0, 2.0, 3.0);
+    // * CAMERA
+    let lookfrom = Vec3(13.0, 5.0, 3.0);
     let lookat = Vec3(0.0, 0.0, 0.0);
     let vup = Vec3(0.0, 1.0, 0.0);
     let dist_to_focus = 10.0;
